@@ -2,17 +2,11 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { searchChunks } from "@/lib/rag/chunker";
-
-const DEEPSEEK_API = "https://api.deepseek.com/v1/chat/completions";
-const API_KEY = process.env.DEEPSEEK_API_KEY;
+import { generateContentStream } from "@/lib/ai/client";
 
 export async function POST(request: Request) {
   try {
     const { messages } = await request.json();
-
-    if (!API_KEY) {
-      return NextResponse.json({ error: "AI not configured" }, { status: 500 });
-    }
 
     const lastUserMessage = messages.filter((m: any) => m.role === "user").pop();
     let knowledgeContext = "";
@@ -64,9 +58,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const systemMessage = {
-      role: "system",
-      content: `أنت مدرب Fitnix AI - المدرب الشخصي الذكي باللغة العربية.
+    const systemPrompt = `أنت مدرب Fitnix AI - المدرب الشخصي الذكي باللغة العربية.
 شخصيتك: مدرب لياقة نخبة محترف، خبير تغذية وبناء أجسام.
 تتحدث العربية بطلاقة واحترافية.
 ودود ومشجع ولكن بطريقة احترافية.
@@ -79,71 +71,9 @@ export async function POST(request: Request) {
 - شجع على التدريب الصحي والطبيعي
 - قدم إجابات منظمة وواضحة
 - استخدم أسلوب المدرب المحترف الواثق
-- استخدم المعرفة المتاحة للإجابة بدقة${knowledgeContext}`,
-    };
+- استخدم المعرفة المتاحة للإجابة بدقة${knowledgeContext}`;
 
-    const response = await fetch(DEEPSEEK_API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [systemMessage, ...messages],
-        stream: true,
-        temperature: 0.7,
-        max_tokens: 2000,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("DeepSeek API error:", error);
-      return NextResponse.json({ error: "AI request failed" }, { status: 502 });
-    }
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        const reader = response.body?.getReader();
-        if (!reader) { controller.close(); return; }
-
-        const decoder = new TextDecoder();
-        let buffer = "";
-
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n");
-            buffer = lines.pop() || "";
-
-            for (const line of lines) {
-              const trimmed = line.trim();
-              if (!trimmed || !trimmed.startsWith("data: ")) continue;
-              const data = trimmed.slice(6);
-              if (data === "[DONE]") continue;
-
-              try {
-                const parsed = JSON.parse(data);
-                const content = parsed.choices?.[0]?.delta?.content || "";
-                if (content) {
-                  controller.enqueue(new TextEncoder().encode(
-                    `data: ${JSON.stringify({ content })}\n\n`
-                  ));
-                }
-              } catch {}
-            }
-          }
-        } catch (err) {
-          console.error("Stream error:", err);
-        } finally {
-          controller.close();
-        }
-      },
-    });
+    const stream = await generateContentStream(messages, systemPrompt);
 
     return new Response(stream, {
       headers: {
@@ -152,8 +82,8 @@ export async function POST(request: Request) {
         Connection: "keep-alive",
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Chat API error:", error);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal error" }, { status: 500 });
   }
 }

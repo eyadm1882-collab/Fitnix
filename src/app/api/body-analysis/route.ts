@@ -1,19 +1,12 @@
 import { NextResponse } from "next/server";
-
-const DEEPSEEK_API = "https://api.deepseek.com/v1/chat/completions";
-const API_KEY = process.env.DEEPSEEK_API_KEY;
+import { generateJSON } from "@/lib/ai/client";
 
 export async function POST(request: Request) {
   try {
     const { frontPhoto, sidePhoto, backPhoto, weight, height, gender } = await request.json();
 
-    if (!API_KEY) {
-      return NextResponse.json({ error: "AI not configured" }, { status: 500 });
-    }
+    const userMessage = `حلل بيانات المستخدم التالية:
 
-    const prompt = `أنت خبير تحليل الجسم واللياقة البدنية. حلل البيانات التالية وقدّم تقريراً مفصلاً باللغة العربية.
-
-معلومات المستخدم:
 - الوزن: ${weight} كجم
 - الطول: ${height} سم
 - الجنس: ${gender === "male" ? "ذكر" : "أنثى"}
@@ -26,9 +19,11 @@ export async function POST(request: Request) {
 5. توزيع الدهون
 6. نقاط القوة والضعف
 7. توصيات للتحسين
-8. ملاحظات عامة
+8. ملاحظات عامة`;
 
-قدم الإجابة بتنسيق JSON:
+    const systemPrompt = `أنت خبير تحليل الجسم واللياقة البدنية. قم بتحليل بيانات المستخدم وقدّم تقريراً مفصلاً باللغة العربية.
+
+أعد النتيجة بتنسيق JSON فقط:
 {
   "bodyFatEstimate": number,
   "muscleMassEstimate": number,
@@ -41,36 +36,17 @@ export async function POST(request: Request) {
   "generalNotes": "string"
 }`;
 
-    const response = await fetch(DEEPSEEK_API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [{ role: "system", content: "أنت خبير تحليل الجسم واللياقة البدنية." }, { role: "user", content: prompt }],
-        temperature: 0.3,
-        max_tokens: 2000,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("DeepSeek analysis error:", error);
-      return NextResponse.json({ error: "Analysis failed" }, { status: 502 });
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
-
-    let analysis;
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-    } catch {
-      analysis = null;
-    }
+    const analysis = await generateJSON<{
+      bodyFatEstimate: number;
+      muscleMassEstimate: number;
+      symmetryScore: number;
+      postureNotes: string;
+      fatDistribution: string;
+      strengthPoints: string[];
+      weaknessPoints: string[];
+      recommendations: string[];
+      generalNotes: string;
+    }>([{ role: "user", content: userMessage }], systemPrompt);
 
     return NextResponse.json({
       analysis: analysis || {
@@ -82,11 +58,11 @@ export async function POST(request: Request) {
         strengthPoints: [],
         weaknessPoints: [],
         recommendations: ["حاول التقاط صور أوضح"],
-        generalNotes: content.slice(0, 500),
+        generalNotes: "تعذر الاتصال بخدمة التحليل",
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Body analysis error:", error);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal error" }, { status: 500 });
   }
 }

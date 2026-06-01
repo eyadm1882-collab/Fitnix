@@ -1,22 +1,18 @@
 import { NextResponse } from "next/server";
-
-const DEEPSEEK_API = "https://api.deepseek.com/v1/chat/completions";
-const API_KEY = process.env.DEEPSEEK_API_KEY;
+import { generateJSON } from "@/lib/ai/client";
 
 export async function POST(request: Request) {
   try {
     const { foodDescription, portionSize } = await request.json();
 
-    if (!API_KEY) {
-      return NextResponse.json({ error: "AI not configured" }, { status: 500 });
-    }
-
-    const prompt = `أنت خبير تغذية وتحليل طعام. حلل الوجبة التالية وقدم تحليلًا غذائيًا دقيقًا باللغة العربية.
+    const userMessage = `حلل الوجبة التالية:
 
 الوجبة: ${foodDescription || "غير محددة"}
-الحجم التقريبي: ${portionSize || "حصة متوسطة"}
+الحجم التقريبي: ${portionSize || "حصة متوسطة"}`;
 
-قم بإرجاع النتيجة بتنسيق JSON فقط:
+    const systemPrompt = `أنت خبير تغذية وتحليل طعام. حلل الوجبة وقدم تحليلًا غذائيًا دقيقًا باللغة العربية.
+
+أعد النتيجة بتنسيق JSON فقط:
 {
   "foodName": "اسم الوجبة",
   "calories": number (إجمالي السعرات),
@@ -32,39 +28,20 @@ export async function POST(request: Request) {
   "ingredients": ["مكون 1", "مكون 2"]
 }`;
 
-    const response = await fetch(DEEPSEEK_API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          { role: "system", content: "أنت خبير تغذية دقيق. رد فقط بـ JSON." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.2,
-        max_tokens: 1000,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("Food analysis error:", error);
-      return NextResponse.json({ error: "Analysis failed" }, { status: 502 });
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
-
-    let analysis;
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-    } catch {
-      analysis = null;
-    }
+    const analysis = await generateJSON<{
+      foodName: string;
+      calories: number;
+      protein: number;
+      carbs: number;
+      fats: number;
+      fiber: number;
+      sugar: number;
+      servingSize: string;
+      mealType: string;
+      healthScore: number;
+      tips: string[];
+      ingredients: string[];
+    }>([{ role: "user", content: userMessage }], systemPrompt);
 
     return NextResponse.json({
       analysis: analysis || {
@@ -77,8 +54,8 @@ export async function POST(request: Request) {
         ingredients: [],
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Food API error:", error);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal error" }, { status: 500 });
   }
 }
