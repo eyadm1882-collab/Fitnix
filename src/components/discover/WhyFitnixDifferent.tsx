@@ -100,7 +100,7 @@ export default function WhyFitnixDifferent() {
               features: [true, false, false, false, false, true, false, false],
             },
             {
-              name: "Gemini",
+              name: "AI",
               desc: "مساعد عام متعدد المجالات",
               icon: Brain,
               features: [true, false, false, false, false, true, false, false],

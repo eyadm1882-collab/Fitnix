@@ -1,75 +1,54 @@
-const GEMINI_API = "https://generativelanguage.googleapis.com/v1/models";
-const MODEL = "gemini-2.0-flash";
+const API_URL = "https://api.deepseek.com/v1/chat/completions";
+const MODEL = "deepseek-chat";
 
 function getKey(): string {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) throw new Error("GEMINI_API_KEY not configured");
+  const key = process.env.DEEPSEEK_API_KEY;
+  if (!key) throw new Error("DEEPSEEK_API_KEY not configured");
   return key;
 }
 
-interface GeminiMessage {
-  role: "user" | "model";
-  parts: { text: string }[];
-}
+async function deepseekFetch(messages: { role: string; content: string }[], systemPrompt?: string, stream = false) {
+  const body: Record<string, any> = {
+    model: MODEL,
+    messages: systemPrompt
+      ? [{ role: "system", content: systemPrompt }, ...messages]
+      : messages,
+    temperature: stream ? 0.7 : 0.2,
+    max_tokens: 2000,
+    stream,
+  };
 
-interface GeminiResponse {
-  candidates?: {
-    content?: {
-      parts?: { text?: string }[];
-    };
-  }[];
-}
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getKey()}`,
+    },
+    body: JSON.stringify(body),
+  });
 
-function convertMessages(messages: { role: string; content: string }[]): GeminiMessage[] {
-  return messages.map((m) => ({
-    role: m.role === "assistant" ? "model" : "user",
-    parts: [{ text: m.content }],
-  }));
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`DeepSeek API error (${res.status}): ${err}`);
+  }
+
+  return res;
 }
 
 export async function generateContent(
   messages: { role: string; content: string }[],
   systemPrompt?: string
 ): Promise<string> {
-  const body: Record<string, any> = {
-    contents: convertMessages(messages),
-    generationConfig: { temperature: 0.7, maxOutputTokens: 2000 },
-  };
-  if (systemPrompt) body.systemInstruction = { parts: [{ text: systemPrompt }] };
-
-  const res = await fetch(
-    `${GEMINI_API}/${MODEL}:generateContent?key=${getKey()}`,
-    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
-  );
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini API error (${res.status}): ${err}`);
-  }
-
-  const data: GeminiResponse = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const res = await deepseekFetch(messages, systemPrompt, false);
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || "";
 }
 
 export async function generateContentStream(
   messages: { role: string; content: string }[],
   systemPrompt?: string
 ): Promise<ReadableStream> {
-  const body: Record<string, any> = {
-    contents: convertMessages(messages),
-    generationConfig: { temperature: 0.7, maxOutputTokens: 2000 },
-  };
-  if (systemPrompt) body.systemInstruction = { parts: [{ text: systemPrompt }] };
-
-  const res = await fetch(
-    `${GEMINI_API}/${MODEL}:streamGenerateContent?alt=sse&key=${getKey()}`,
-    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
-  );
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini stream error (${res.status}): ${err}`);
-  }
+  const res = await deepseekFetch(messages, systemPrompt, true);
 
   return new ReadableStream({
     async start(controller) {
@@ -96,10 +75,10 @@ export async function generateContentStream(
 
             try {
               const parsed = JSON.parse(data);
-              const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || "";
-              if (text) {
+              const content = parsed.choices?.[0]?.delta?.content || "";
+              if (content) {
                 controller.enqueue(new TextEncoder().encode(
-                  `data: ${JSON.stringify({ content: text })}\n\n`
+                  `data: ${JSON.stringify({ content })}\n\n`
                 ));
               }
             } catch {}
@@ -116,24 +95,9 @@ export async function generateJSON<T>(
   messages: { role: string; content: string }[],
   systemPrompt: string
 ): Promise<T | null> {
-  const body: Record<string, any> = {
-    contents: convertMessages(messages),
-    generationConfig: { temperature: 0.2, maxOutputTokens: 2000 },
-  };
-  if (systemPrompt) body.systemInstruction = { parts: [{ text: systemPrompt }] };
-
-  const res = await fetch(
-    `${GEMINI_API}/${MODEL}:generateContent?key=${getKey()}`,
-    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
-  );
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini JSON error (${res.status}): ${err}`);
-  }
-
-  const data: GeminiResponse = await res.json();
-  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const res = await deepseekFetch(messages, systemPrompt, false);
+  const data = await res.json();
+  const content = data.choices?.[0]?.message?.content || "";
 
   try {
     const jsonMatch = content.match(/\{[\s\S]*\}/);
