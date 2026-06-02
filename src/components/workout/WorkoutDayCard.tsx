@@ -6,8 +6,8 @@ import { Check, Dumbbell, ChevronDown, ChevronUp, RotateCcw } from "lucide-react
 
 interface Exercise {
   name: string;
-  muscleGroup: string;
-  sets: string;
+  muscleGroup?: string;
+  sets: string | number;
   reps: string;
 }
 
@@ -115,11 +115,11 @@ export default function WorkoutDayCard({ day, focus, exercises, isActive, onSele
                   <p className={`text-sm font-medium ${done ? "text-gray-400 line-through" : "text-gray-700"}`}>
                     {ex.name}
                   </p>
-                  <p className="text-xs text-gray-400">{ex.muscleGroup}</p>
+                  <p className="text-xs text-gray-400">{ex.muscleGroup || "عام"}</p>
                 </div>
                 <div className="text-left">
                   <p className={`text-xs font-bold ${done ? "text-gray-300" : "text-gray-600"}`}>
-                    {ex.sets}×{ex.reps}
+                    {String(ex.sets)}×{ex.reps}
                   </p>
                 </div>
               </motion.div>
