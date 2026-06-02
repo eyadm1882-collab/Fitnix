@@ -4,7 +4,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-light-bg" dir="rtl">
       <DashboardNav />
-      {children}
+      <main className="pt-16">{children}</main>
     </div>
   );
 }

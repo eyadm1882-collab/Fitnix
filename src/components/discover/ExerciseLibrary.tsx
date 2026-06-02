@@ -121,7 +121,7 @@ export default function ExerciseLibrary() {
 
   return (
     <div className="min-h-screen bg-light-bg">
-      <div className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-36 pt-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           className="mb-6 text-center"
@@ -138,13 +138,13 @@ export default function ExerciseLibrary() {
 
         {/* Body Image Section - Large + Toggle */}
         <motion.div
-          className="relative mx-auto mb-6 flex flex-col items-center gap-4 md:flex-row md:items-start md:gap-8"
+          className="relative mx-auto mb-8 flex flex-col items-center gap-5 md:flex-row md:items-start md:gap-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
           {/* Body Image - Large */}
-          <div className="relative mx-auto aspect-[3/5] w-full max-w-xs overflow-hidden rounded-3xl bg-white shadow-lg sm:max-w-sm md:mx-0 md:max-w-md lg:max-w-lg">
+          <div className="relative mx-auto aspect-[3/5] w-full max-w-[280px] overflow-hidden rounded-2xl bg-white shadow-lg sm:max-w-sm md:mx-0 md:max-w-xs lg:max-w-sm">
             <AnimatePresence mode="wait">
               <motion.div
                 key={bodyView}
@@ -187,12 +187,12 @@ export default function ExerciseLibrary() {
             </div>
 
             {/* Muscle Categories Grid */}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
               {muscleGroups.map((group, i) => (
                 <motion.button
                   key={group.id}
                   onClick={() => setSelectedMuscle(group.id)}
-                  className={`flex items-center gap-3 rounded-2xl border p-3 transition-all ${
+                  className={`flex items-center gap-3 rounded-2xl border-2 p-3 transition-all ${
                     selectedMuscle === group.id
                       ? "border-fitnix bg-fitnix/10 shadow-md shadow-fitnix/10"
                       : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm"
@@ -203,12 +203,12 @@ export default function ExerciseLibrary() {
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl">
+                  <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-50">
                     <Image
                       src={`/muscleslibrary.tsx/${group.id}.png`}
                       alt={group.name}
                       fill
-                      className="object-cover"
+                      className="object-cover p-0.5"
                     />
                   </div>
                   <span
@@ -218,6 +218,11 @@ export default function ExerciseLibrary() {
                   >
                     {group.name}
                   </span>
+                  {selectedMuscle === group.id && (
+                    <span className="mr-auto flex h-5 w-5 items-center justify-center rounded-full bg-fitnix/20">
+                      <span className="h-2 w-2 rounded-full bg-fitnix" />
+                    </span>
+                  )}
                 </motion.button>
               ))}
             </div>
@@ -235,19 +240,22 @@ export default function ExerciseLibrary() {
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.4 }}
             >
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  تمارين <span className="text-fitnix">{selectedGroup.name}</span>
-                </h2>
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-black text-gray-900">
+                    تمارين <span className="text-fitnix">{selectedGroup.name}</span>
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-400">{selectedGroup.exercises.length} تمارين</p>
+                </div>
                 <button
                   onClick={() => setSelectedMuscle(null)}
-                  className="rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-500 transition-all hover:bg-gray-50 hover:text-gray-700"
+                  className="rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-500 transition-all hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300"
                 >
                   إلغاء الاختيار
                 </button>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {selectedGroup.exercises.map((exercise, i) => (
                   <motion.div
                     key={exercise.name}
@@ -255,11 +263,11 @@ export default function ExerciseLibrary() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.06, duration: 0.4 }}
-                    whileHover={{ y: -3 }}
+                    whileHover={{ y: -4 }}
                     onClick={() => setSelectedExercise(exercise)}
                   >
                     {/* Exercise Image */}
-                    <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-2xl">
                       {exerciseMedia[exercise.name]?.image ? (
                         <img src={exerciseMedia[exercise.name].image!} alt={exercise.name} className="h-full w-full object-cover transition-all group-hover:scale-105" />
                       ) : (
@@ -281,14 +289,14 @@ export default function ExerciseLibrary() {
                       </div>
                     </div>
                     <div className="p-4">
-                      <h3 className="text-base font-bold text-gray-900 transition-colors group-hover:text-fitnix">
+                      <h3 className="text-sm font-bold text-gray-900 transition-colors group-hover:text-fitnix leading-relaxed">
                         {exercise.name}
                       </h3>
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="rounded-full bg-fitnix/5 px-2.5 py-0.5 text-xs font-medium text-fitnix">
+                      <div className="mt-2.5 flex items-center gap-2">
+                        <span className="rounded-full bg-fitnix/5 px-2.5 py-0.5 text-[11px] font-medium text-fitnix">
                           {selectedGroup.name}
                         </span>
-                        <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-500">
+                        <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-[11px] text-gray-500">
                           تمرين
                         </span>
                       </div>
@@ -297,7 +305,7 @@ export default function ExerciseLibrary() {
                           e.stopPropagation();
                           setAiContext(`شرح تمرين ${exercise.name} للعضلة ${selectedGroup.name}`);
                         }}
-                        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-fitnix/20 bg-fitnix/5 px-3 py-2 text-xs font-bold text-fitnix transition-all hover:bg-fitnix/10"
+                        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-fitnix/20 bg-fitnix/5 px-3 py-2 text-xs font-bold text-fitnix transition-all hover:bg-fitnix/10 hover:border-fitnix/30"
                       >
                         <Bot className="h-3.5 w-3.5" />
                         اسأل AI
@@ -310,14 +318,16 @@ export default function ExerciseLibrary() {
           ) : (
             <motion.div
               key="empty"
-              className="mt-6 text-center"
+              className="mt-8 text-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <div className="rounded-3xl border border-dashed border-gray-200 bg-white/50 p-12">
-                <Dumbbell className="mx-auto mb-4 h-12 w-12 text-gray-200" />
-                <h3 className="mb-1 text-xl font-bold text-gray-400">
+              <div className="rounded-3xl border border-dashed border-gray-200 bg-white/60 p-16 backdrop-blur-sm">
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-fitnix/5">
+                  <Dumbbell className="h-8 w-8 text-fitnix/30" />
+                </div>
+                <h3 className="mb-2 text-xl font-bold text-gray-400">
                   اختر عضلة من القائمة
                 </h3>
                 <p className="text-sm text-gray-300">

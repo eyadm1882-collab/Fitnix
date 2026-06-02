@@ -13,61 +13,33 @@ export default function Hero() {
   return (
     <>
       <section className="relative min-h-svh w-full overflow-hidden bg-black md:min-h-screen">
-        {/* Background Image - responsive sources */}
         <div className="absolute inset-0">
           <picture>
-            <source
-              media="(min-width: 1024px)"
-              srcSet="/Hero.tsx/73e790dc-e19e-48a1-8d1e-67e7e6d1cbaa.jpg"
-            />
-            <source
-              media="(min-width: 640px)"
-              srcSet="/Hero.tsx/255738c6-e0c9-4542-b55b-1fe12b86e2aa.jpg"
-            />
-            <img
-              src="/Hero.tsx/73e790dc-e19e-48a1-8d1e-67e7e6d1cbaa.jpg"
-              alt="Fitnix Hero"
-              className="h-full w-full object-cover"
-            />
+            <source media="(min-width: 1024px)" srcSet="/Hero.tsx/73e790dc-e19e-48a1-8d1e-67e7e6d1cbaa.jpg" />
+            <source media="(min-width: 640px)" srcSet="/Hero.tsx/255738c6-e0c9-4542-b55b-1fe12b86e2aa.jpg" />
+            <img src="/Hero.tsx/73e790dc-e19e-48a1-8d1e-67e7e6d1cbaa.jpg" alt="Fitnix Hero" className="h-full w-full object-cover" />
           </picture>
-          {/* Desktop: right-side gradient overlay for RTL */}
           <div className="absolute inset-0 bg-gradient-to-l from-black/70 via-black/30 to-black/60 max-md:hidden" />
-          {/* Mobile: bottom blur gradient only */}
           <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-black via-black/70 to-transparent md:hidden" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 md:hidden" />
         </div>
 
-        {/* Animated particles */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(4)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute h-48 w-48 rounded-full bg-fitnix/5 blur-3xl sm:h-64 sm:w-64"
-              style={{
-                left: `${10 + i * 25}%`,
-                top: `${15 + i * 15}%`,
-              }}
-              animate={{
-                y: [0, -20, 0],
-                scale: [1, 1.1, 1],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: 4 + i * 0.5,
-                repeat: Infinity,
-                delay: i * 0.3,
-                ease: "easeInOut",
-              }}
+              style={{ left: `${10 + i * 25}%`, top: `${15 + i * 15}%` }}
+              animate={{ y: [0, -20, 0], scale: [1, 1.1, 1], opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: 4 + i * 0.5, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
             />
           ))}
         </div>
 
-        {/* Content - desktop: right-aligned, mobile: bottom stacked */}
-        <div className="relative z-10 flex min-h-svh flex-col items-center justify-end px-4 pb-16 pt-28 text-center md:min-h-screen md:items-end md:justify-center md:pb-0 md:pe-16 md:ps-8 md:text-right lg:pe-24 xl:pe-32">
-          <div className="max-w-xl">
-            {/* Badge */}
+        <div className="relative z-10 flex min-h-svh flex-col items-center justify-center px-5 pb-12 pt-20 text-center md:min-h-screen md:items-end md:justify-center md:pb-16 md:pe-16 md:ps-8 md:text-right lg:pe-28 xl:pe-36">
+          <div className="max-w-2xl">
             <motion.div
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-fitnix/20 bg-fitnix/10 px-4 py-1.5 backdrop-blur-sm md:px-5 md:py-2"
+              className="mb-8 inline-flex items-center gap-2 rounded-full border border-fitnix/20 bg-fitnix/10 px-4 py-1.5 backdrop-blur-sm md:px-5 md:py-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
@@ -78,12 +50,11 @@ export default function Hero() {
               </span>
             </motion.div>
 
-            {/* Main Heading */}
             <motion.h1
-              className="mb-4 text-4xl font-black leading-tight sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
+              className="mb-5 text-4xl font-black leading-[1.1] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
+              transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
               سجل في تطبيق{" "}
               <span className="bg-gradient-to-r from-fitnix to-fitnix-light bg-clip-text text-transparent">
@@ -91,9 +62,8 @@ export default function Hero() {
               </span>
             </motion.h1>
 
-            {/* Subtitle */}
             <motion.p
-              className="mb-8 max-w-lg text-base leading-relaxed text-white/60 sm:text-lg md:text-xl"
+              className="mb-10 max-w-lg text-base leading-relaxed text-white/60 sm:text-lg md:text-xl"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
@@ -103,16 +73,15 @@ export default function Hero() {
               خطط تمارين وتغذية مخصصة بتقنية AI
             </motion.p>
 
-            {/* Buttons - right aligned on desktop */}
             <motion.div
-              className="flex flex-col items-stretch gap-3 sm:flex-row md:items-start"
+              className="flex flex-col items-stretch gap-4 sm:flex-row md:items-start"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.8 }}
             >
               <motion.button
                 onClick={() => router.push("/discover")}
-                className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-fitnix to-fitnix-dark px-8 py-3.5 text-base font-bold text-white shadow-xl shadow-fitnix/25 transition-all hover:shadow-2xl hover:shadow-fitnix/40 sm:px-10 sm:text-lg"
+                className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-fitnix to-fitnix-dark px-8 py-4 text-base font-bold text-white shadow-xl shadow-fitnix/25 transition-all hover:shadow-2xl hover:shadow-fitnix/40 sm:px-10 sm:text-lg"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
@@ -128,7 +97,7 @@ export default function Hero() {
 
               <motion.button
                 onClick={() => setModalOpen(true)}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-white/20 px-8 py-3.5 text-base font-bold text-white backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/5 sm:px-10 sm:text-lg"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-white/20 px-8 py-4 text-base font-bold text-white backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/5 sm:px-10 sm:text-lg"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
@@ -136,9 +105,8 @@ export default function Hero() {
               </motion.button>
             </motion.div>
 
-            {/* Stats */}
             <motion.div
-              className="mt-10 flex flex-wrap items-center justify-center gap-6 md:justify-start md:gap-10"
+              className="mt-12 flex flex-wrap items-center justify-center gap-8 md:justify-start md:gap-12"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.8 }}
@@ -155,10 +123,8 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1 + i * 0.1 }}
                 >
-                  <div className="text-xl font-black text-white sm:text-2xl">
-                    {stat.number}
-                  </div>
-                  <div className="mt-0.5 text-xs text-white/50 sm:text-sm">{stat.label}</div>
+                  <div className="text-2xl font-black text-white sm:text-3xl">{stat.number}</div>
+                  <div className="mt-1 text-xs text-white/50 sm:text-sm">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
