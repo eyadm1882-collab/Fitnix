@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock } from "lucide-react";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -23,9 +23,11 @@ export default function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setError(error.message === "Invalid login credentials"
-        ? "البريد الإلكتروني أو كلمة المرور غير صحيحة"
-        : "حدث خطأ. حاول مرة أخرى");
+      if (error.message === "Invalid login credentials") {
+        setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      } else {
+        setError("حدث خطأ. حاول مرة أخرى");
+      }
       setLoading(false);
     } else {
       router.push("/dashboard");
@@ -37,66 +39,56 @@ export default function LoginForm() {
     <motion.form
       onSubmit={handleLogin}
       className="space-y-5"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
     >
       {error && (
-        <motion.div
-          className="rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-600"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-        >
+        <div className="rounded-xl bg-red-50 border border-red-100 p-3 text-sm font-medium text-red-600">
           {error}
-        </motion.div>
+        </div>
       )}
 
       <div>
-        <label className="mb-2 block text-sm font-bold text-gray-700">البريد الإلكتروني</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          dir="ltr"
-          className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-3.5 text-right text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-fitnix focus:ring-2 focus:ring-fitnix/20"
-          placeholder="your@email.com"
-        />
+        <label className="mb-1.5 block text-sm font-bold text-gray-700">البريد الإلكتروني</label>
+        <div className="relative">
+          <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            dir="ltr"
+            className="input pr-10"
+            placeholder="your@email.com"
+          />
+        </div>
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-bold text-gray-700">كلمة المرور</label>
+        <label className="mb-1.5 block text-sm font-bold text-gray-700">كلمة المرور</label>
         <div className="relative">
+          <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-3.5 text-right text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-fitnix focus:ring-2 focus:ring-fitnix/20"
+            className="input pr-10"
             placeholder="••••••••"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >
-            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
       </div>
 
-      <motion.button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-2xl bg-gradient-to-r from-fitnix to-fitnix-dark py-3.5 text-base font-bold text-white shadow-lg shadow-fitnix/25 transition-all hover:shadow-xl disabled:opacity-50"
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-      >
-        {loading ? (
-          <Loader2 className="mx-auto h-5 w-5 animate-spin" />
-        ) : (
-          "تسجيل الدخول"
-        )}
-      </motion.button>
+      <button type="submit" disabled={loading} className="btn-primary w-full py-3.5">
+        {loading ? <Loader2 className="mx-auto h-5 w-5 animate-spin" /> : "تسجيل الدخول"}
+      </button>
     </motion.form>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, ArrowLeft, Home } from "lucide-react";
+import { Loader2, CheckCircle, ArrowLeft, Home, CreditCard } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -22,7 +22,7 @@ export default function Step5Payment({ data, onBack }: StepProps) {
   const userData = data?.registration || {};
   const plan = data?.plans?.plan;
   const planPrice = plan === "monthly" ? "35" : "100";
-  const planName = plan === "monthly" ? "عرض الصيف شهر" : "عرض الصيف 3 شهور";
+  const planName = plan === "monthly" ? "شهري" : "٣ شهور";
   const gumroadUrl = plan === "monthly" ? GUMROAD_MONTHLY : GUMROAD_QUARTERLY;
 
   const handleContinueToPayment = () => {
@@ -65,91 +65,77 @@ export default function Step5Payment({ data, onBack }: StepProps) {
     <>
       <motion.div
         className="space-y-6"
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -50 }}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -16 }}
       >
         <div className="text-center">
+          <CreditCard className="mx-auto mb-2 h-8 w-8 text-fitnix" />
           <h2 className="text-2xl font-black text-gray-900">الدفع</h2>
           <p className="mt-1 text-sm text-gray-500">بريمية بطاقة دفع آمنة</p>
         </div>
 
-        {/* Premium Payment Card */}
+        {/* Premium Card */}
         <motion.div
-          className="relative mx-auto aspect-[1.586/1] w-full max-w-sm overflow-hidden rounded-3xl bg-gradient-to-br from-fitnix to-emerald-700 p-6 shadow-2xl"
-          initial={{ scale: 0.95, y: 20 }}
+          className="relative mx-auto aspect-[1.586/1] w-full max-w-sm overflow-hidden rounded-2xl bg-gradient-to-br from-fitnix to-emerald-700 p-6 shadow-xl"
+          initial={{ scale: 0.95, y: 16 }}
           animate={{ scale: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          {/* Card Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full border-[3px] border-white" />
             <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full border-[3px] border-white" />
-            <div className="absolute left-1/4 top-1/3 h-20 w-20 rounded-full border-2 border-white/50" />
           </div>
 
           <div className="relative z-10 flex h-full flex-col justify-between">
-            {/* Top Row */}
             <div className="flex items-start justify-between">
-              <Image src="/header.tsx/middle.png" alt="Fitnix" width={40} height={40} className="h-8 w-8 rounded-lg bg-white/20 p-1.5" />
-              <span className="rounded-lg bg-white/20 px-3 py-1 text-[10px] font-bold text-white">Mada</span>
+              <Image src="/header.tsx/middle.png" alt="Fitnix" width={36} height={36} className="h-7 w-7 rounded-lg bg-white/20 p-1" />
+              <span className="rounded-lg bg-white/20 px-2.5 py-1 text-[10px] font-bold text-white">Mada</span>
             </div>
-
-            {/* Middle */}
             <div className="text-white">
-              <p className="mb-1 text-sm font-medium text-white/70">
-                {userData.fullName || "اسم المستخدم"}
-              </p>
+              <p className="mb-1 text-sm font-medium text-white/70">{userData.fullName || "اسم المستخدم"}</p>
               <p className="text-lg font-bold">{planName}</p>
             </div>
-
-            {/* Bottom Row */}
             <div className="flex items-end justify-between">
               <div className="text-white">
                 <span className="text-2xl font-black">{planPrice}</span>
                 <span className="mr-1 text-sm text-white/70">ريال</span>
               </div>
-              <span className="text-lg font-bold tracking-wider text-white/50" style={{ fontFamily: "serif" }}>
-                VISA
-              </span>
+              <span className="text-lg font-bold tracking-wider text-white/50" style={{ fontFamily: "serif" }}>VISA</span>
             </div>
           </div>
-
-          {/* Chip */}
           <div className="absolute bottom-16 right-6 h-8 w-12 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-500/60" />
         </motion.div>
 
-        {/* Payment Details Summary */}
-        <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5 text-right">
-          <div className="flex justify-between py-2 text-sm">
+        {/* Summary */}
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 space-y-2">
+          <div className="flex justify-between text-sm">
             <span className="text-gray-500">الباقة</span>
             <span className="font-bold text-gray-900">{planName}</span>
           </div>
-          <div className="flex justify-between py-2 text-sm">
+          <div className="flex justify-between text-sm">
             <span className="text-gray-500">السعر</span>
             <span className="font-bold text-gray-900">{planPrice} ريال</span>
           </div>
-          <div className="flex justify-between border-t border-gray-200 pt-3 text-sm">
+          <div className="flex justify-between border-t border-gray-200 pt-2 text-sm">
             <span className="text-gray-500">الإجمالي</span>
             <span className="text-lg font-black text-fitnix">{planPrice} ريال</span>
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <button onClick={onBack} className="flex-1 rounded-2xl border-2 border-gray-200 py-3.5 text-sm font-bold text-gray-600 transition-all hover:bg-gray-50">
-            السابق
-          </button>
+        <div className="flex gap-3 pt-2">
+          <button onClick={onBack} className="btn-secondary flex-1 py-3.5">السابق</button>
           <motion.button
             onClick={handleContinueToPayment}
             disabled={loading}
-            className="flex-1 rounded-2xl bg-gradient-to-r from-fitnix to-fitnix-dark py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
+            className="btn-primary flex-1 py-3.5"
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
           >
             {loading ? (
               <Loader2 className="mx-auto h-5 w-5 animate-spin" />
             ) : (
-              `متابعة للدفع - ${planPrice} ريال`
+              `متابعة للدفع — ${planPrice} ريال`
             )}
           </motion.button>
         </div>
@@ -158,35 +144,31 @@ export default function Step5Payment({ data, onBack }: StepProps) {
       {/* Post-Payment Modal */}
       <AnimatePresence>
         {showPostPayment && (
-          <motion.div className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          >
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div className="relative z-10 w-full max-w-sm rounded-3xl border border-white/10 bg-white/10 p-8 backdrop-blur-2xl"
-              initial={{ scale: 0.8, y: 40 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.8, y: 40 }}>
+            <motion.div
+              className="relative z-10 w-full max-w-sm rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur-2xl"
+              initial={{ scale: 0.9, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 24 }}
+            >
               <div className="text-center">
-                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-fitnix to-fitnix-dark">
-                  <span className="text-3xl">🎉</span>
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-fitnix to-fitnix-dark shadow-lg">
+                  <CheckCircle className="h-8 w-8 text-white" />
                 </div>
                 <h2 className="mb-2 text-2xl font-bold text-white">تم استلام طلبك!</h2>
-                <p className="mb-1 text-sm text-white/70">
-                  يتم الآن تجهيز جدولك وخطتك
-                </p>
-                <p className="mb-6 text-xs text-white/50">
-                  عد خلال نصف يوم إلى يوم كامل
-                </p>
+                <p className="mb-1 text-sm text-white/70">يتم الآن تجهيز جدولك وخطتك</p>
+                <p className="mb-6 text-xs text-white/50">عد خلال نصف يوم إلى يوم كامل</p>
                 <div className="space-y-3">
-                  <a
-                    href="/dashboard"
-                    className="block w-full rounded-2xl bg-gradient-to-r from-fitnix to-fitnix-dark py-3.5 text-center text-sm font-bold text-white shadow-lg transition-all hover:shadow-xl"
-                  >
+                  <a href="/dashboard" className="btn-primary w-full py-3.5 block text-center">
                     متابعة
                   </a>
-                  <a
-                    href="/auth/login"
-                    className="flex items-center justify-center gap-2 rounded-2xl border border-white/20 py-3.5 text-sm font-bold text-white transition-all hover:bg-white/5"
-                  >
-                    <Home className="h-4 w-4" />
-                    تسجيل الدخول
+                  <a href="/auth/login" className="btn-secondary w-full py-3.5 block text-center border-white/20 text-white hover:bg-white/5">
+                    <div className="flex items-center justify-center gap-2">
+                      <Home className="h-4 w-4" />
+                      تسجيل الدخول
+                    </div>
                   </a>
                 </div>
               </div>

@@ -37,20 +37,19 @@ export default function WorkoutDayCard({ day, focus, exercises, isActive, onSele
   return (
     <motion.div
       layout
-      className={`cursor-pointer rounded-2xl border-2 transition-all ${
+      className={`cursor-pointer rounded-xl border transition-all ${
         isActive
-          ? "border-fitnix bg-white shadow-lg"
-          : "border-gray-100 bg-white/80 hover:border-gray-200"
+          ? "border-fitnix bg-white shadow-md"
+          : "border-gray-100 bg-white/80 hover:border-gray-200 hover:shadow-sm"
       }`}
       onClick={onSelect}
     >
-      {/* Day Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-xl text-lg font-black transition-all ${
+            className={`flex h-11 w-11 items-center justify-center rounded-xl text-base font-black transition-all ${
               isComplete
-                ? "bg-gradient-to-br from-fitnix to-fitnix-dark text-white"
+                ? "bg-fitnix text-white"
                 : isActive
                 ? "bg-fitnix/10 text-fitnix"
                 : "bg-gray-50 text-gray-400"
@@ -64,27 +63,22 @@ export default function WorkoutDayCard({ day, focus, exercises, isActive, onSele
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">
-            {completed.size}/{exercises.length}
-          </span>
+          <div className="h-1.5 w-16 rounded-full bg-gray-100 overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-fitnix"
+              initial={{ width: "0%" }}
+              animate={{ width: `${progress * 100}%` }}
+              transition={{ duration: 0.4 }}
+            />
+          </div>
+          <span className="text-xs text-gray-400 w-8 text-left">{completed.size}/{exercises.length}</span>
           {isActive ? <ChevronUp className="h-4 w-4 text-fitnix" /> : <ChevronDown className="h-4 w-4 text-gray-300" />}
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="mx-4 h-1 rounded-full bg-gray-100">
-        <motion.div
-          className="h-full rounded-full bg-gradient-to-l from-fitnix to-fitnix-dark"
-          initial={{ width: "0%" }}
-          animate={{ width: `${progress * 100}%` }}
-          transition={{ duration: 0.4 }}
-        />
-      </div>
-
-      {/* Exercises */}
       {isActive && (
         <motion.div
-          className="space-y-1 p-4 pt-3"
+          className="space-y-1 px-4 pb-4"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
@@ -96,20 +90,16 @@ export default function WorkoutDayCard({ day, focus, exercises, isActive, onSele
                 key={ex.name}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
+                transition={{ delay: i * 0.04 }}
                 onClick={(e) => { e.stopPropagation(); toggleExercise(ex.name); }}
                 className={`flex items-center gap-3 rounded-xl p-3 transition-all ${
                   done ? "bg-fitnix/5" : "hover:bg-gray-50"
                 }`}
               >
-                <div
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-2 transition-all ${
-                    done
-                      ? "border-fitnix bg-fitnix text-white"
-                      : "border-gray-200 text-transparent"
-                  }`}
-                >
-                  {done && <Check className="h-4 w-4" />}
+                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 transition-all ${
+                  done ? "border-fitnix bg-fitnix text-white" : "border-gray-200 text-transparent"
+                }`}>
+                  {done && <Check className="h-3.5 w-3.5" />}
                 </div>
                 <div className="flex-1">
                   <p className={`text-sm font-medium ${done ? "text-gray-400 line-through" : "text-gray-700"}`}>
@@ -126,13 +116,11 @@ export default function WorkoutDayCard({ day, focus, exercises, isActive, onSele
             );
           })}
 
-          {/* Reset Button */}
           {completed.size > 0 && (
             <motion.button
               onClick={(e) => { e.stopPropagation(); setCompleted(new Set()); }}
               className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gray-50 py-2.5 text-xs font-medium text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
               whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
             >
               <RotateCcw className="h-3 w-3" />
               إعادة تعيين

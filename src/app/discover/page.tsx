@@ -14,8 +14,8 @@ export default function DiscoverPage() {
 
   return (
     <div className="min-h-screen bg-light-bg">
-      <Header simplified />
-      <div className="relative pt-20">
+      <Header />
+      <div className="relative pt-16">
         <AnimatePresence mode="wait">
           {activeTab === "marketing" ? (
             <motion.div
